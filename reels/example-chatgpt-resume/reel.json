@@ -1,0 +1,149 @@
+{
+  "slug": "chatgpt-ats-resume",
+  "title": "ChatGPT vechu resume ATS-friendly aakkam",
+  "topic": "Use ChatGPT to make your resume ATS-friendly for a specific job",
+  "sources": [
+    {
+      "claim": "Many employers screen resumes with an Applicant Tracking System (ATS) before a person reads them; ATS matches job keywords and reads simple layouts best",
+      "note": "General, widely documented hiring practice; no statistic used"
+    }
+  ],
+  "beats": [
+    {
+      "id": "hook",
+      "scene": "hook",
+      "say": "ജോലിക്ക് apply ചെയ്തിട്ട് ഒരു മറുപടിയും കിട്ടുന്നില്ലേ? ചിലപ്പോൾ നിങ്ങളുടെ resume ഒരാളും വായിച്ചിട്ടുപോലും ഉണ്ടാവില്ല.",
+      "emphasis": [
+        "മറുപടിയും",
+        "resume",
+        "വായിച്ചിട്ടുപോലും"
+      ],
+      "pause_between_ms": 450,
+      "pause_after_ms": 650,
+      "sfx": "whoosh"
+    },
+    {
+      "id": "why",
+      "scene": "text",
+      "kicker": "കാരണം",
+      "say": "പല കമ്പനികളും resume ആദ്യം ഒരു software-നെക്കൊണ്ടാണ് നോക്കിക്കുന്നത്. ജോലിക്ക് വേണ്ട വാക്കുകൾ ഇല്ലെങ്കിൽ, നിങ്ങളുടെ resume പിന്നിലായിപ്പോകും.",
+      "emphasis": [
+        "software",
+        "വാക്കുകൾ",
+        "പിന്നിലായിപ്പോകും"
+      ],
+      "size": 76,
+      "pause_between_ms": 450,
+      "pause_after_ms": 600,
+      "sfx": "pop"
+    },
+    {
+      "id": "step1",
+      "scene": "phone",
+      "step": 1,
+      "label": "Resume-ഉം ജോലി വിവരണവും കൊടുക്കുക",
+      "app": {
+        "name": "ChatGPT",
+        "color": "#C6FF3D"
+      },
+      "say": "ആദ്യം ChatGPT തുറന്ന്, നിങ്ങളുടെ resume-ഉം, apply ചെയ്യാൻ പോകുന്ന ജോലിയുടെ വിവരണവും അതിൽ ഇടുക.",
+      "screen": [
+        {
+          "kind": "upload",
+          "name": "my_resume.pdf",
+          "at": "resume"
+        },
+        {
+          "kind": "msg",
+          "role": "user",
+          "text": "Job description: Data Analyst. SQL, Excel, Power BI, dashboards…",
+          "at": "വിവരണവും",
+          "tap_at": "ഇടുക"
+        }
+      ],
+      "pause_between_ms": 400,
+      "pause_after_ms": 450,
+      "sfx": "pop"
+    },
+    {
+      "id": "step2",
+      "scene": "phone",
+      "step": 2,
+      "label": "ഇല്ലാത്ത വാക്കുകൾ ചോദിക്കുക",
+      "app": {
+        "name": "ChatGPT",
+        "color": "#C6FF3D"
+      },
+      "say": "എന്നിട്ട് ഇങ്ങനെ ചോദിക്കുക: ഈ ജോലിക്ക് വേണ്ട ഏതൊക്കെ വാക്കുകളാണ് എന്റെ resume-ൽ ഇല്ലാത്തത്?",
+      "screen": [
+        {
+          "kind": "input",
+          "text": "ഈ ജോലിക്ക് വേണ്ട ഏതൊക്കെ വാക്കുകളാണ് എന്റെ resume-ൽ ഇല്ലാത്തത്?",
+          "at": "ചോദിക്കുക",
+          "tap_at": "ഇല്ലാത്തത്"
+        },
+        {
+          "kind": "card",
+          "title": "Missing keywords",
+          "lines": [
+            "Power BI",
+            "Dashboard reporting",
+            "SQL joins"
+          ],
+          "at": "ഇല്ലാത്തത്",
+          "delay": 0.7
+        }
+      ],
+      "pause_after_ms": 500,
+      "sfx": "pop"
+    },
+    {
+      "id": "step3",
+      "scene": "phone",
+      "step": 3,
+      "label": "ലളിതമായ format-ൽ മാറ്റിയെഴുതുക",
+      "app": {
+        "name": "ChatGPT",
+        "color": "#C6FF3D"
+      },
+      "say": "അവസാനം, ആ വാക്കുകൾ ചേർത്ത് ലളിതമായ ഒരു format-ൽ resume മാറ്റിയെഴുതാൻ പറയുക. ഒരു കാര്യം ശ്രദ്ധിക്കണം: നിങ്ങൾക്ക് ശരിക്കും അറിയാവുന്ന കാര്യങ്ങൾ മാത്രം ചേർക്കുക.",
+      "screen": [
+        {
+          "kind": "msg",
+          "role": "user",
+          "text": "ഈ വാക്കുകൾ ചേർത്ത്, simple one-column format-ൽ resume മാറ്റിയെഴുതൂ.",
+          "at": "ചേർത്ത്"
+        },
+        {
+          "kind": "card",
+          "title": "Resume v2 ✓",
+          "lines": [
+            "One column, clear headings",
+            "Job keywords added",
+            "No tables, no photos"
+          ],
+          "at": "പറയുക"
+        },
+        {
+          "kind": "button",
+          "label": "അറിയാവുന്നത് മാത്രം",
+          "color": "#FF4D8D",
+          "at": "ശ്രദ്ധിക്കണം",
+          "tap_at": "മാത്രം"
+        }
+      ],
+      "pause_between_ms": 500,
+      "pause_after_ms": 650,
+      "sfx": "pop"
+    },
+    {
+      "id": "cta",
+      "scene": "cta",
+      "headline": "Save ചെയ്യൂ, Follow ചെയ്യൂ",
+      "say": "ഇത് ഉപകാരപ്പെട്ടെങ്കിൽ save ചെയ്തു വെക്കൂ. എന്റെ ചാനൽ ഇപ്പോൾ തന്നെ follow ചെയ്യൂ!",
+      "follow_at": "follow",
+      "pause_between_ms": 400,
+      "pause_after_ms": 300
+    }
+  ]
+}

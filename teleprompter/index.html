@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reel Teleprompter</title>
+<style>
+  :root { --bg:#0B0F1A; --accent:#C6FF3D; --tap:#FF4D8D; --text:#F5F7FF; --muted:#2A3350; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text); font-family: "Segoe UI", "Nirmala UI", "Kartika", sans-serif; }
+  #bar { position:fixed; top:0; left:0; right:0; display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:10px 16px; background:#111827; z-index:5; }
+  button, select { font:inherit; font-size:16px; padding:8px 14px; border-radius:10px; border:1px solid #3A4568; background:#1B2238; color:var(--text); cursor:pointer; }
+  button.main { background:var(--accent); color:#0B0F1A; border:none; font-weight:700; }
+  button.rec { background:var(--tap); border:none; font-weight:700; }
+  label { font-size:14px; color:#AAB3CF; display:flex; align-items:center; gap:6px; }
+  #wrap { position:fixed; top:64px; bottom:0; left:0; right:0; overflow:hidden; }
+  #script { position:absolute; left:0; right:0; padding:45vh 8vw 60vh; font-size:var(--fs,54px); line-height:1.5; font-weight:600; text-align:center; }
+  #script p { margin:0 0 1.2em; }
+  #script p .tag { display:block; font-size:.38em; letter-spacing:3px; color:var(--accent); margin-bottom:.3em; font-family:"Segoe UI",sans-serif; }
+  #guide { position:fixed; left:0; right:0; top:calc(64px + 38vh); height:2px; background:rgba(198,255,61,.5); pointer-events:none; z-index:4; }
+  .mirror #script { transform: scaleX(-1); }
+  #cam { position:fixed; right:16px; bottom:16px; width:220px; border-radius:14px; border:3px solid var(--muted); z-index:6; display:none; transform:scaleX(-1); }
+  #cam.on { display:block; }
+  #recdot { display:none; color:var(--tap); font-weight:700; }
+  #recdot.on { display:inline; }
+  #count { position:fixed; inset:0; display:none; align-items:center; justify-content:center; font-size:30vh; font-weight:800; color:var(--accent); background:rgba(11,15,26,.7); z-index:10; }
+  #msg { font-size:14px; color:#AAB3CF; }
+</style>
+</head>
+<body>
+<div id="bar">
+  <button class="main" id="play">▶ Start (Space)</button>
+  <button id="reset">⟲ Top</button>
+  <label>വേഗം <input id="speed" type="range" min="10" max="120" value="38"></label>
+  <label>വലുപ്പം <input id="size" type="range" min="30" max="96" value="54"></label>
+  <label><input id="mirror" type="checkbox"> Mirror</label>
+  <button id="camBtn">📷 Laptop camera</button>
+  <button class="rec" id="recBtn" disabled>● Record</button>
+  <span id="recdot">● REC <span id="rect">0:00</span></span>
+  <span id="msg"></span>
+</div>
+<div id="guide"></div>
+<div id="wrap"><div id="script"></div></div>
+<video id="cam" autoplay muted playsinline></video>
+<div id="count"></div>
+<script>
+// Edit these lines for your own script: [label, text]
+const LINES = [
+  ["HOOK · energy കൂട്ടി, camera-യിൽ നോക്കി", "ഞാൻ എന്റെ reels ഒന്നും edit ചെയ്യുന്നില്ല. ഒരു AI skill ആണ് എല്ലാം ചെയ്യുന്നത്!"],
+  ["എന്താണ് skill", "Claude-ൽ ഒരു skill എന്ന് പറഞ്ഞാൽ, AI-ക്ക് ഒരു പുതിയ ജോലി പഠിപ്പിച്ചു കൊടുക്കുന്നത് പോലെയാണ്. ഒരു തവണ install ചെയ്താൽ മതി."],
+  ["STEP 1", "ആദ്യം, skill-ന്റെ folder download ചെയ്യുക. അതിൽ SKILL.md എന്ന ഒരു file ഉണ്ടാകും."],
+  ["STEP 2", "Claude Code ആണെങ്കിൽ, ആ folder നിങ്ങളുടെ computer-ലെ skills folder-ലേക്ക് ഇടുക. Claude app ആണെങ്കിൽ, Settings-ൽ zip ആയി upload ചെയ്യാം."],
+  ["STEP 3", "എന്നിട്ട് slash, skill-ന്റെ പേര്, പിന്നെ നിങ്ങളുടെ topic type ചെയ്യുക. ബാക്കി എല്ലാം അത് ചെയ്യും!"],
+  ["CTA · ചിരിച്ചുകൊണ്ട്", "എന്റെ reels ഉണ്ടാക്കുന്ന ഈ skill വേണോ? താഴെ SKILL എന്ന് comment ചെയ്യൂ, ഞാൻ link അയച്ചു തരാം!"]
+];
+const fitBar = () => { const h = document.getElementById("bar").offsetHeight; document.getElementById("wrap").style.top = h + "px"; document.getElementById("guide").style.top = (h + innerHeight * 0.38) + "px"; };
+addEventListener("resize", fitBar); setTimeout(fitBar, 0);
+const box = document.getElementById("script");
+box.innerHTML = LINES.map(([t, s]) => `<p><span class="tag">${t}</span>${s}</p>`).join("");
+let y = 0, playing = false, last = 0;
+const speed = document.getElementById("speed"), size = document.getElementById("size");
+size.oninput = () => document.documentElement.style.setProperty("--fs", size.value + "px");
+document.getElementById("mirror").onchange = (e) => document.body.classList.toggle("mirror", e.target.checked);
+function frame(ts) {
+  if (playing) { y += (ts - last) / 1000 * speed.value * 1.6; box.style.top = -y + "px"; }
+  last = ts; requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+const play = document.getElementById("play");
+function toggle() { playing = !playing; play.textContent = playing ? "❚❚ Pause (Space)" : "▶ Start (Space)"; }
+play.onclick = toggle;
+document.getElementById("reset").onclick = () => { y = 0; box.style.top = "0px"; };
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") { e.preventDefault(); toggle(); }
+  if (e.code === "ArrowUp") y = Math.max(0, y - 60);
+  if (e.code === "ArrowDown") y += 60;
+});
+document.getElementById("wrap").addEventListener("wheel", (e) => { y = Math.max(0, y + e.deltaY * 0.5); box.style.top = -y + "px"; });
+
+// Optional: record with the laptop camera (phone camera is better quality - see HOW TO).
+let stream = null, rec = null, chunks = [], t0 = 0, timer = null;
+const cam = document.getElementById("cam"), recBtn = document.getElementById("recBtn"), msg = document.getElementById("msg");
+document.getElementById("camBtn").onclick = async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    cam.srcObject = stream; cam.classList.add("on"); recBtn.disabled = false; msg.textContent = "Camera ready";
+  } catch (e) { msg.textContent = "Camera തുറക്കാൻ പറ്റിയില്ല: " + e.message; }
+};
+recBtn.onclick = async () => {
+  if (rec && rec.state === "recording") { rec.stop(); return; }
+  const c = document.getElementById("count"); c.style.display = "flex";
+  for (const n of [3, 2, 1]) { c.textContent = n; await new Promise((r) => setTimeout(r, 800)); }
+  c.style.display = "none";
+  chunks = []; rec = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus") ? "video/webm;codecs=vp9,opus" : "video/webm" , videoBitsPerSecond: 8000000 });
+  rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+  rec.onstop = () => {
+    clearInterval(timer); document.getElementById("recdot").classList.remove("on"); recBtn.textContent = "● Record";
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
+    a.download = "reel-take-" + new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-") + ".webm"; a.click();
+    msg.textContent = "Saved to Downloads. ആ file reel folder-ലേക്ക് മാറ്റൂ."; if (playing) toggle();
+  };
+  rec.start(1000); t0 = Date.now(); recBtn.textContent = "■ Stop";
+  document.getElementById("recdot").classList.add("on");
+  timer = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); document.getElementById("rect").textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }, 250);
+  y = 0; box.style.top = "0px"; if (!playing) toggle();
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Anek Malayalam"; src: url("../fonts/AnekMalayalam.ttf"); font-weight: 100 900; font-stretch: 75% 125%; }
+@font-face { font-family: "Space Grotesk"; src: url("../fonts/SpaceGrotesk.ttf"); font-weight: 300 700; }
+:root { --bg:#0B0F1A; --accent:#C6FF3D; --tap:#FF4D8D; --text:#F5F7FF; --muted:#2A3350; --mtext:#8A93B2; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+body { font-family: "Space Grotesk", "Anek Malayalam", sans-serif; color: var(--text); position: relative; }
+#bg { position: absolute; inset: 0; overflow: hidden; }
+#grid { position: absolute; inset: -80px; background-image:
+  linear-gradient(var(--muted) 2px, transparent 2px), linear-gradient(90deg, var(--muted) 2px, transparent 2px);
+  background-size: 80px 80px; opacity: .28; }
+#glow { position: absolute; width: 900px; height: 900px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(198,255,61,.16), rgba(198,255,61,0) 65%); }
+#vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(11,15,26,0) 40%, rgba(11,15,26,.85) 100%); }
+#hud { position: absolute; left: 70px; right: 130px; top: 228px; height: 70px; }
+#bar { position: absolute; left: 0; right: 0; top: 0; height: 6px; border-radius: 3px; background: var(--muted); overflow: hidden; }
+#barfill { height: 100%; width: 0; background: var(--accent); }
+#handle { position: absolute; left: 0; top: 22px; font: 500 28px "Space Grotesk"; color: var(--mtext); letter-spacing: .5px; }
+.scene { position: absolute; inset: 0; opacity: 0; }
+/* kinetic text */
+.kin { position: absolute; left: 70px; right: 130px; top: 360px; height: 1040px; display: flex; flex-wrap: wrap;
+  align-content: center; justify-content: flex-start; gap: 6px 26px; font-weight: 800; line-height: 1.12; }
+.kin .w { display: inline-block; position: relative; transform-origin: 50% 70%; }
+.kin .w.em { color: var(--accent); }
+.kin .w .ul { position: absolute; left: 0; bottom: -4px; height: 12px; background: var(--accent); width: 100%; transform-origin: 0 50%; border-radius: 6px; opacity: .9; }
+.kicker { position: absolute; left: 70px; top: 330px; font: 700 32px "Space Grotesk"; color: var(--bg); background: var(--accent); padding: 8px 20px; border-radius: 12px; letter-spacing: 2px; }
+/* phone scene */
+.step { position: absolute; left: 70px; top: 330px; font: 700 32px "Space Grotesk"; color: var(--bg); background: var(--accent); padding: 8px 20px; border-radius: 12px; letter-spacing: 2px; }
+.label { position: absolute; left: 70px; right: 130px; top: 400px; font-weight: 800; font-size: 56px; line-height: 1.15; }
+.phone { position: absolute; left: 240px; top: 560px; width: 540px; height: 860px; border-radius: 64px; background: #151B2E;
+  border: 3px solid #3A4568; padding: 14px; }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 50px; overflow: hidden; background: #0F1424; display: flex; flex-direction: column; }
+.topbar { height: 96px; padding: 34px 28px 0; display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #1E2640; flex: none; }
+.dot { width: 30px; height: 30px; border-radius: 50%; }
+.appname { font: 700 30px "Space Grotesk"; }
+.content { flex: 1; padding: 22px 20px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+.bottom { padding: 16px 18px 22px; flex: none; }
+.it { opacity: 0; position: relative; }
+.msg { max-width: 86%; padding: 16px 20px; border-radius: 24px; font-size: 27px; line-height: 1.32; font-weight: 500; }
+.msg.user { align-self: flex-end; color: #0B0F1A; border-bottom-right-radius: 8px; }
+.msg.ai { align-self: flex-start; background: #232B45; color: var(--text); border-bottom-left-radius: 8px; }
+.input { display: flex; align-items: center; gap: 12px; background: #1B2238; border: 2px solid #2E3858; border-radius: 34px; padding: 14px 16px 14px 24px; font-size: 26px; min-height: 72px; }
+.input .txt { flex: 1; line-height: 1.3; }
+.input .ph { color: #6B7494; }
+.input .send { width: 46px; height: 46px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; color: #0B0F1A; font: 700 28px "Space Grotesk"; }
+.button { align-self: center; padding: 18px 36px; border-radius: 40px; font: 700 28px "Space Grotesk", "Anek Malayalam"; color: #0B0F1A; }
+.upload { display: flex; align-items: center; gap: 16px; background: #1B2238; border: 2px dashed #3A4568; border-radius: 22px; padding: 18px 20px; font: 600 26px "Space Grotesk"; }
+.fileic { width: 44px; height: 54px; border-radius: 8px; background: #FF5A4E; position: relative; flex: none; }
+.fileic::after { content: "PDF"; position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font: 700 13px "Space Grotesk"; color: #fff; }
+.card { background: #1B2238; border-radius: 22px; padding: 18px 22px; }
+.card .ct { font-weight: 700; font-size: 27px; margin-bottom: 10px; }
+.card .cl { font-size: 24px; color: #C9CFE4; line-height: 1.4; }
+.toggle { display: flex; align-items: center; justify-content: space-between; background: #1B2238; border-radius: 22px; padding: 20px 22px; font-size: 27px; font-weight: 600; }
+.sw { width: 76px; height: 42px; border-radius: 21px; background: #3A4568; position: relative; flex: none; }
+.sw i { position: absolute; top: 5px; left: 5px; width: 32px; height: 32px; border-radius: 50%; background: #fff; }
+.ring { position: absolute; border: 6px solid var(--tap); border-radius: 50%; opacity: 0; pointer-events: none; }
+.finger { position: absolute; width: 58px; height: 58px; border-radius: 50%; background: rgba(255,255,255,.92); border: 5px solid var(--tap); opacity: 0; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+/* cta */
+.ctahead { position: absolute; left: 70px; right: 130px; top: 470px; text-align: center; font-weight: 800; font-size: 76px; line-height: 1.15; }
+.handlebig { position: absolute; left: 70px; right: 130px; top: 760px; text-align: center; font: 700 96px "Space Grotesk"; color: var(--accent); }
+.follow { position: absolute; left: 345px; top: 920px; width: 330px; height: 104px; border-radius: 26px; background: var(--tap); color: #fff;
+  font: 700 46px "Space Grotesk"; display: flex; align-items: center; justify-content: center; }
+.kwbox { position: absolute; left: 150px; width: 720px; top: 1090px; border: 3px solid var(--accent); border-radius: 28px; padding: 22px 26px; text-align: center; font-size: 44px; font-weight: 700; }
+.kwbox b { color: var(--accent); font-family: "Space Grotesk"; letter-spacing: 3px; }
+/* captions */
+#cap { position: absolute; left: 70px; width: 880px; top: 1446px; display: flex; justify-content: center; }
+#capin { background: rgba(11,15,26,.86); border: 2px solid #2A3350; border-radius: 26px; padding: 14px 28px 10px; font-weight: 700; font-size: 52px; line-height: 1.25;
+  text-align: center; max-width: 880px; opacity: 0; }
+#capin .cw { display: inline-block; margin: 0 8px; transform-origin: 50% 80%; }
+#capin .cw.on { color: var(--accent); }
+</style>
+</head>
+<body>
+<div id="bg"><div id="grid"></div><div id="glow"></div><div id="vignette"></div></div>
+<div id="stage"></div>
+<div id="cap"><div id="capin"></div></div>
+<div id="hud"><div id="bar"><div id="barfill"></div></div><div id="handle"></div></div>
+<script>
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const smooth = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+const back = (x) => { x = clamp(x); const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const norm = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}\p{M}]/gu, "");
+const seg = new Intl.Segmenter("ml", { granularity: "grapheme" });
+const graphemes = (s) => Array.from(seg.segment(s), (g) => g.segment);
+const el = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (parent) parent.appendChild(e); return e; };
+const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
+let TL, scenes = [], chunks = [];
+
+function kineticWords(beat, root, opts) {
+  const box = el("div", "kin", root);
+  const chars = beat.words.reduce((a, w) => a + w.text.length, 0);
+  box.style.fontSize = (opts.size || (chars <= 28 ? 124 : chars <= 50 ? 104 : chars <= 80 ? 86 : 72)) + "px";
+  if (opts.top) box.style.top = opts.top + "px";
+  const em = (beat.emphasis || []).map(norm);
+  return beat.words.map((w) => {
+    const s = el("span", "w", box, esc(w.text));
+    const isEm = em.some((e) => e && norm(w.text).includes(e));
+    if (isEm) { s.classList.add("em"); el("i", "ul", s); }
+    return { node: s, w, isEm };
+  });
+}
+
+function buildHook(beat, root) {
+  if (beat.kicker) el("div", "kicker", root, esc(beat.kicker));
+  return { words: kineticWords(beat, root, { top: beat.kicker ? 420 : 360 }) };
+}
+
+function buildPhone(beat, root) {
+  const app = beat.app || { name: "App", color: "#C6FF3D" };
+  const step = el("div", "step", root, esc(beat.step_label || ("STEP " + (beat.step || ""))));
+  const label = el("div", "label", root, esc(beat.label || ""));
+  const phone = el("div", "phone", root);
+  const screen = el("div", "screen", phone);
+  if (app.bg) screen.style.background = app.bg;
+  const top = el("div", "topbar", screen);
+  el("div", "dot", top).style.background = app.color;
+  el("div", "appname", top, esc(app.name));
+  const content = el("div", "content", screen);
+  const bottom = el("div", "bottom", screen);
+  const items = (beat.screen || []).map((it) => {
+    let n;
+    const host = it.kind === "input" ? bottom : content;
+    if (it.kind === "msg") {
+      n = el("div", "it msg " + (it.role || "ai"), host);
+      if (it.role === "user") n.style.background = app.user_color || app.color;
+      n._full = graphemes(it.text || "");
+    } else if (it.kind === "input") {
+      n = el("div", "it input", host);
+      n._txt = el("div", "txt", n);
+      const send = el("div", "send", n, "&#8593;");
+      send.style.background = app.color;
+      n._tap = send;
+      n._full = graphemes(it.text || "");
+      n._ph = it.placeholder || "Message";
+    } else if (it.kind === "button") {
+      n = el("div", "it button", host, esc(it.label));
+      n.style.background = it.color || app.color;
+    } else if (it.kind === "upload") {
+      n = el("div", "it upload", host); el("div", "fileic", n); el("div", "", n, esc(it.name || "file.pdf"));
+    } else if (it.kind === "card") {
+      n = el("div", "it card", host);
+      el("div", "ct", n, esc(it.title || ""));
+      (it.lines || []).forEach((l) => el("div", "cl", n, "• " + esc(l)));
+    } else if (it.kind === "toggle") {
+      n = el("div", "it toggle", host); el("div", "", n, esc(it.label));
+      const sw = el("div", "sw", n); n._knob = el("i", "", sw); n._sw = sw;
+    } else {
+      n = el("div", "it card", host, esc(it.text || ""));
+    }
+    return { it, n };
+  });
+  const ring = el("div", "ring", root);
+  const finger = el("div", "finger", root);
+  return { step, label, phone, items, ring, finger, app };
+}
+
+function buildText(beat, root) {
+  if (beat.kicker) el("div", "kicker", root, esc(beat.kicker));
+  return { words: kineticWords(beat, root, { size: beat.size, top: beat.kicker ? 420 : 360 }) };
+}
+
+function buildCta(beat, root) {
+  const head = el("div", "ctahead", root, esc(beat.headline || "Follow ചെയ്യൂ"));
+  const handle = el("div", "handlebig", root, esc(TL.profile.handle));
+  const follow = el("div", "follow", root, "Follow");
+  let kw = null;
+  if (beat.keyword) kw = el("div", "kwbox", root, `Comment ചെയ്യൂ: <b>${esc(beat.keyword)}</b>`);
+  return { head, handle, follow, kw };
+}
+
+function buildChunks() {
+  chunks = [];
+  TL.beats.forEach((b, bi) => {
+    if (b.scene === "hook" || b.scene === "text") return;
+    (b.sentences || []).forEach((s) => {
+      const ws = b.words.filter((w) => w.start >= s.start - 0.01 && w.start < s.end + 0.01);
+      let cur = [];
+      const flush = () => { if (cur.length) chunks.push({ words: cur, start: cur[0].start, beat: bi }); cur = []; };
+      ws.forEach((w) => {
+        const len = cur.reduce((a, x) => a + x.text.length + 1, 0) + w.text.length;
+        if (cur.length >= 4 || len > 24) flush();
+        cur.push(w);
+      });
+      flush();
+    });
+  });
+  chunks.forEach((c, i) => {
+    const b = TL.beats[c.beat];
+    const nxt = chunks[i + 1];
+    const lastEnd = c.words[c.words.length - 1].end;
+    c.end = Math.min(nxt && nxt.beat === c.beat ? nxt.start : lastEnd + 0.6, b.end);
+  });
+}
+
+window.setup = async function (tl) {
+  TL = tl;
+  const p = tl.profile.palette;
+  const r = document.documentElement.style;
+  r.setProperty("--bg", p.bg); r.setProperty("--accent", p.accent); r.setProperty("--tap", p.tap);
+  r.setProperty("--text", p.text); r.setProperty("--muted", p.muted); r.setProperty("--mtext", p.muted_text);
+  document.getElementById("handle").textContent = tl.profile.handle;
+  const stage = document.getElementById("stage");
+  scenes = tl.beats.map((b) => {
+    const root = el("div", "scene", stage);
+    const kind = b.scene;
+    const parts = kind === "hook" ? buildHook(b, root) : kind === "phone" ? buildPhone(b, root)
+      : kind === "cta" ? buildCta(b, root) : buildText(b, root);
+    return { b, root, parts };
+  });
+  buildChunks();
+  await Promise.all([document.fonts.load('800 60px "Anek Malayalam"', "മലയാളം"), document.fonts.load('700 60px "Space Grotesk"', "Ab")]);
+  await document.fonts.ready;
+};
+
+function animWords(words, t) {
+  words.forEach(({ node, w, isEm }) => {
+    const p = (t - (w.start - 0.06)) / 0.2;
+    const a = clamp(p);
+    node.style.opacity = a;
+    const s = 1.35 - 0.35 * back(p);
+    node.style.transform = `translateY(${(1 - ease(p)) * 30}px) scale(${a > 0 ? s : 1.35})`;
+    if (isEm) node.querySelector(".ul").style.transform = `scaleX(${ease((t - w.end + 0.05) / 0.25)})`;
+  });
+}
+
+function relRect(n, root) {
+  const a = n.getBoundingClientRect();
+  return { x: a.left + a.width / 2, y: a.top + a.height / 2, w: a.width, h: a.height };
+}
+
+function animPhone(sc, t) {
+  const { b, parts } = sc;
+  const intro = ease((t - b.start) / 0.35);
+  parts.step.style.opacity = intro; parts.step.style.transform = `translateX(${(1 - intro) * -40}px)`;
+  const li = ease((t - b.start - 0.08) / 0.35);
+  parts.label.style.opacity = li; parts.label.style.transform = `translateY(${(1 - li) * 24}px)`;
+  const pi = ease((t - b.start - 0.1) / 0.45);
+  parts.phone.style.opacity = pi;
+  parts.phone.style.transform = `translateY(${(1 - pi) * 120 + Math.sin(t * 1.4) * 6}px) rotate(${(1 - pi) * 4}deg)`;
+  let tap = null;
+  parts.items.forEach(({ it, n }) => {
+    const a = ease((t - it.t) / 0.28);
+    n.style.opacity = it.kind === "input" ? 1 : a;
+    if (it.kind !== "input") n.style.transform = `translateY(${(1 - a) * 26}px)`;
+    if (it.kind === "msg") {
+      const full = n._full;
+      const typ = it.role === "ai" ? clamp((t - it.t) / Math.min(1.8, 0.035 * full.length + 0.2)) : 1;
+      n.textContent = full.slice(0, Math.max(1, Math.round(full.length * typ))).join("") || " ";
+      n.style.visibility = a > 0 ? "visible" : "hidden";
+    }
+    if (it.kind === "input") {
+      const typ = clamp((t - it.t) / Math.min(1.6, 0.04 * n._full.length + 0.2));
+      if (t < it.t) { n._txt.innerHTML = `<span class="ph">${esc(n._ph)}</span>`; }
+      else n._txt.textContent = n._full.slice(0, Math.max(1, Math.round(n._full.length * typ))).join("") + (typ < 1 && Math.floor(t * 4) % 2 ? "|" : "");
+    }
+    if (it.kind === "toggle") {
+      const on = it.tap_t != null ? ease((t - it.tap_t) / 0.2) : 0;
+      n._knob.style.transform = `translateX(${on * 34}px)`;
+      n._sw.style.background = on > 0.5 ? parts.app.color : "#3A4568";
+    }
+    if (it.tap_t != null) {
+      const hl = t > it.tap_t - 0.35 && t < it.tap_t + 0.9;
+      n.style.outline = hl ? "5px solid var(--tap)" : "none";
+      n.style.outlineOffset = "5px";
+      if (t > it.tap_t - 0.6 && t < it.tap_t + 0.9) tap = { it, n };
+    }
+  });
+  if (tap) {
+    const r = relRect(tap.n._tap || tap.n);
+    const k = clamp((t - (tap.it.tap_t - 0.6)) / 0.45);
+    const fx = r.x + 160 * (1 - ease(k)) + 20, fy = r.y + 220 * (1 - ease(k)) + 26;
+    const press = t > tap.it.tap_t - 0.05 && t < tap.it.tap_t + 0.15 ? 0.85 : 1;
+    parts.finger.style.opacity = clamp(k * 3) * (1 - clamp((t - tap.it.tap_t - 0.6) / 0.3));
+    parts.finger.style.left = fx - 29 + "px"; parts.finger.style.top = fy - 29 + "px";
+    parts.finger.style.transform = `scale(${press})`;
+    const rp = (t - tap.it.tap_t) / 0.55;
+    if (rp > 0 && rp < 1) {
+      const rad = 30 + 90 * ease(rp);
+      Object.assign(parts.ring.style, { opacity: 1 - rp, left: r.x - rad + "px", top: r.y - rad + "px", width: rad * 2 + "px", height: rad * 2 + "px" });
+    } else parts.ring.style.opacity = 0;
+  } else { parts.finger.style.opacity = 0; parts.ring.style.opacity = 0; }
+}
+
+function animCta(sc, t) {
+  const { b, parts } = sc;
+  const a = ease((t - b.start) / 0.35);
+  parts.head.style.opacity = a; parts.head.style.transform = `translateY(${(1 - a) * 30}px)`;
+  const h = back((t - b.start - 0.25) / 0.4);
+  parts.handle.style.opacity = clamp((t - b.start - 0.25) / 0.2); parts.handle.style.transform = `scale(${0.7 + 0.3 * h})`;
+  const fT = b.follow_t != null ? b.follow_t : b.start + 0.9;
+  const f = back((t - b.start - 0.5) / 0.4);
+  const pulse = t > fT ? 1 + 0.06 * Math.sin((t - fT) * 8) * Math.exp(-(t - fT) * 1.5) : 1;
+  parts.follow.style.opacity = clamp((t - b.start - 0.5) / 0.2);
+  parts.follow.style.transform = `scale(${(0.6 + 0.4 * f) * pulse})`;
+  const followed = t > fT + 0.15;
+  parts.follow.textContent = followed ? "Following" : "Follow";
+  parts.follow.style.background = followed ? "#2A3350" : "var(--tap)";
+  if (parts.kw) {
+    const kT = b.keyword_t != null ? b.keyword_t : b.start + 1.4;
+    const k = ease((t - kT) / 0.35);
+    parts.kw.style.opacity = k; parts.kw.style.transform = `translateY(${(1 - k) * 30}px)`;
+  }
+}
+
+function animCaptions(t) {
+  const box = document.getElementById("capin");
+  const c = chunks.find((c) => t >= c.start - 0.05 && t < c.end);
+  if (!c) { box.style.opacity = 0; box._c = null; return; }
+  if (box._c !== c) {
+    box.innerHTML = c.words.map((w) => `<span class="cw">${esc(w.text)}</span>`).join(" ");
+    box._c = c;
+  }
+  const p = ease((t - c.start + 0.05) / 0.14);
+  box.style.opacity = p;
+  box.style.transform = `scale(${0.94 + 0.06 * p})`;
+  const spans = box.querySelectorAll(".cw");
+  c.words.forEach((w, i) => {
+    const next = c.words[i + 1];
+    const on = t >= w.start - 0.03 && t < (next ? next.start - 0.03 : c.end);
+    spans[i].classList.toggle("on", on);
+    spans[i].style.transform = on ? "scale(1.08)" : "scale(1)";
+  });
+}
+
+window.renderAt = function (t) {
+  const g = document.getElementById("grid");
+  g.style.transform = `translate(${(t * 14) % 80}px, ${(t * 22) % 80}px)`;
+  const glow = document.getElementById("glow");
+  glow.style.left = 90 + Math.sin(t * 0.5) * 160 + "px";
+  glow.style.top = 380 + Math.cos(t * 0.37) * 260 + "px";
+  document.getElementById("barfill").style.width = (100 * clamp(t / TL.duration)) + "%";
+  scenes.forEach((sc, i) => {
+    const { b, root } = sc;
+    const last = i === scenes.length - 1;
+    const enter = i === 0 ? smooth((t - b.start) / 0.22) : smooth((t - b.start + 0.1) / 0.22);
+    const exit = last ? 1 : 1 - smooth((t - (b.end - 0.16)) / 0.16);
+    const vis = enter * exit;
+    root.style.opacity = vis;
+    root.style.display = vis <= 0.001 ? "none" : "block";
+    if (vis <= 0.001) return;
+    if (b.scene === "hook" || b.scene === "text") animWords(sc.parts.words, t);
+    else if (b.scene === "phone") animPhone(sc, t);
+    else if (b.scene === "cta") animCta(sc, t);
+  });
+  animCaptions(t);
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+.venv*/
+node_modules/
+profile.json
+voice/
+finished/
+reels/*/out/
+reels/*/audio/
+reels/*/timeline.json
+factory/assets/
+__pycache__/
+*.mp4
+*.wav
+*.webm

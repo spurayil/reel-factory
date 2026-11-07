@@ -1,0 +1,47 @@
+{
+  "name": "Your Name",
+  "handle": "@yourhandle",
+  "niche": "AI tools tips",
+  "audience": "Students and job seekers in Kerala",
+  "goal": "Viewer tries the tip today and follows",
+  "narration_language": "ml",
+  "narration_style": "Natural, clear spoken Malayalam that any Kerala student understands; explain the why simply; only tool names (ChatGPT, Gemini) stay English; avoid needless English words",
+  "voice": {
+    "engine": "edge",
+    "name": "ml-IN-MidhunNeural",
+    "rate": "-5%",
+    "fx": "highpass=f=75,equalizer=f=130:t=q:w=0.9:g=4,equalizer=f=350:t=q:w=1.2:g=-3,equalizer=f=2800:t=q:w=1:g=5,equalizer=f=10000:t=q:w=1:g=2,acompressor=threshold=-26dB:ratio=5:attack=3:release=70:makeup=6,asoftclip=type=tanh:threshold=0.9",
+    "_clone_example": {
+      "engine": "indicf5",
+      "ref_audio": "voice/ref.wav",
+      "ref_text": "voice/ref.txt",
+      "speed": 1.12,
+      "cfg_strength": 2.6,
+      "nfe_step": 32,
+      "takes": 3,
+      "fallback": {
+        "engine": "edge",
+        "name": "ml-IN-MidhunNeural",
+        "rate": "-5%"
+      }
+    }
+  },
+  "palette": {
+    "bg": "#0B0F1A",
+    "accent": "#C6FF3D",
+    "tap": "#FF4D8D",
+    "text": "#F5F7FF",
+    "muted": "#2A3350",
+    "muted_text": "#8A93B2"
+  },
+  "fonts": {
+    "malayalam": "Anek Malayalam",
+    "latin": "Space Grotesk"
+  },
+  "length_seconds": [
+    30,
+    45
+  ],
+  "max_steps": 3,
+  "cta_style": "Say 'എന്റെ ചാനൽ follow ചെയ്യൂ' or a comment keyword; never speak the handle"
+}

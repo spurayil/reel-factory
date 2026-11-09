@@ -4,6 +4,8 @@
 
 Give it one topic. Claude writes the script, makes the voice, animates a kinetic-text hook and phone-mockup steps, adds word-by-word captions and music, then checks the video (resolution, loudness, black frames, speech vs script) before handing you a 1080x1920 MP4.
 
+📘 **മലയാളം step-by-step guide (PDF):** https://spurayil.github.io/zebu-ai-freebies/reel-factory-guide.pdf
+
 ## What you need
 - **Claude Code** (desktop app or terminal)
 - Python 3.10-3.12, Node.js 18+, FFmpeg, Google Chrome
